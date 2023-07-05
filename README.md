@@ -1,9 +1,9 @@
-#Skinet E-Commerce Application
+# Skinet E-Commerce Application
 ------
 
-##E-commerce application created using ASP.NET Core and Angular
+## E-commerce application created using ASP.NET Core and Angular
 
-###This application was created to practice real world scenarios during development.
+### This application was created to practice real world scenarios during development.
 
 Backend:
 1. ASP.NET Core
