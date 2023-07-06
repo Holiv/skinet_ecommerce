@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Data;
 using Core.Entities;
+using Core.Interfaces;
 
 namespace SkinetECommerceAPI.Controllers
 {
@@ -10,17 +11,17 @@ namespace SkinetECommerceAPI.Controllers
     [Route("api/[controller]")]
     public class ProductsController : ControllerBase
     {
-        private readonly StoreContext _storeContext;
+        private readonly IProductRepository productRepository;
 
-        public ProductsController(StoreContext storeContext)
+        public ProductsController(IProductRepository productRepository)
         {
-            _storeContext = storeContext;
+            this.productRepository = productRepository;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Products>>> GetProducts()
+        public async Task<ActionResult<IReadOnlyList<Products>>> GetProducts()
         {
-            List<Products> products = await _storeContext.Products.ToListAsync();
+            IReadOnlyList<Products> products = await productRepository.GetProductsAsync();
 
             //List<Products> products = new List<Products>
             //{
@@ -28,14 +29,28 @@ namespace SkinetECommerceAPI.Controllers
             //    new Products() { Id = 2, Name = "teste 2"}
             //};
 
-            return products;
+            return Ok(products);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Products>> GetProduct(int id)
         {
             //var products = await _storeContext.Products.Where(prod => prod.Id == id).FirstOrDefaultAsync();
-            return await _storeContext.Products.FindAsync(id);
+            return await productRepository.GetProductByIdAsync(id);
+        }
+
+        [HttpGet("brands")]
+        public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetProductBrands()
+        {
+            var brands = await productRepository.GetProductBrandsAsync();
+            return Ok(brands);
+        }
+
+        [HttpGet("types")]
+        public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetProductBTypes()
+        {
+            var types = await productRepository.GetProductTypesAsync();
+            return Ok(types);
         }
 
     }
