@@ -31,5 +31,9 @@
   <ItemGroup>
     <Folder Include="DTOs\" />
     <Folder Include="Helpers\" />
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="wwwroot\" />
   </ItemGroup>
 </Project>
