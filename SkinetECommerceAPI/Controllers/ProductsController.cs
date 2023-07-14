@@ -36,8 +36,10 @@ namespace SkinetECommerceAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Products>> GetProduct(int id)
         {
-            //var products = await _storeContext.Products.Where(prod => prod.Id == id).FirstOrDefaultAsync();
-            return Ok(await productsRepo.GetByIdAsync(id));
+            var spec = new ProductsWithTypesAndBrandsSpecification(id);
+            var product = await productsRepo.GetEntityWithSpec(spec);
+
+            return Ok(product);
         }
 
         [HttpGet("brands")]
@@ -45,6 +47,15 @@ namespace SkinetECommerceAPI.Controllers
         {
             var brands = await productsBrandRepo.ListAllAsync();
             return Ok(brands);
+        }
+
+        [HttpGet("brands/{id}")]
+        public async Task<ActionResult<ProductBrand>> GetProductBrand(int id)
+        {
+            var spec = new ProductBrandByIdSpecification(id);
+            var brand = await productsBrandRepo.GetEntityByIdWithSpec(spec);
+
+            return Ok(brand);
         }
 
         [HttpGet("types")]
