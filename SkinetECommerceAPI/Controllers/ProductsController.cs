@@ -41,6 +41,8 @@ namespace SkinetECommerceAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Products>> GetProduct(int id)
         {
             var spec = new ProductsWithTypesAndBrandsSpecification(id);
