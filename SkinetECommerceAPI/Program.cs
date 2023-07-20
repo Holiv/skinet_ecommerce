@@ -4,6 +4,7 @@ using Core.Interfaces;
 using SkinetECommerceAPI.Middleware;
 using Microsoft.AspNetCore.Mvc;
 using SkinetECommerceAPI.Errors;
+using SkinetECommerceAPI.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-
+builder.Services.AddApplicationServices(builder.Configuration);
 
 var app = builder.Build();
 

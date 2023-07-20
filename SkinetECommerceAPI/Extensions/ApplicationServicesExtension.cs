@@ -1,6 +1,8 @@
 ﻿using Core.Interfaces;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SkinetECommerceAPI.Errors;
 
 namespace SkinetECommerceAPI.Extensions
 {
@@ -8,21 +10,21 @@ namespace SkinetECommerceAPI.Extensions
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
         {
-            builder.Services.AddSwaggerGen();
-
+            services.AddSwaggerGen();
+            
             // ---> ADDING THE DBCONTEXT TO THE CONTAINER SERVICE
-            builder.Services.AddDbContext<StoreContext>(options =>
+            services.AddDbContext<StoreContext>(options =>
             {
-                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlite(config.GetConnectionString("DefaultConnection"));
             });
 
             // ---> REGISTERING THE REPOSITORY IN THE SERVICES CONTAINER AS SCOPED, IT MEANS IT'LL HAVE A NEW INSTANCE OF IT FOR EACH REQUEST. IT WILL LIVE AND BE ACESSIBLE THROUGH THE METHODS TO BE EXECUTED DURING THE REQUEST.
-            builder.Services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
 
             // ---> WHEN ADDIND GENERICS TO THE CONTAINER, THE STRUCTURE MUST BE AS BELLOW
-            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-            builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            services.Configure<ApiBehaviorOptions>(options =>
             {
                 options.InvalidModelStateResponseFactory = actionContext =>
                 {
@@ -37,6 +39,8 @@ namespace SkinetECommerceAPI.Extensions
                     return new BadRequestObjectResult(errorResponse);
                 };
             });
+
+            return services;
         }
     }
 }
