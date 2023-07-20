@@ -7,12 +7,14 @@ using Core.Interfaces;
 using Core.Specification;
 using AutoMapper;
 using SkinetECommerceAPI.DTOs;
+using SkinetECommerceAPI.Errors;
+using System.Text.Json;
+using System.Net;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace SkinetECommerceAPI.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProductsController : ControllerBase
+    public class ProductsController : BaseApiController
     {
         private readonly IGenericRepository<Products> productsRepo;
         private readonly IGenericRepository<ProductBrand> productsBrandRepo;
@@ -39,11 +41,19 @@ namespace SkinetECommerceAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Products>> GetProduct(int id)
         {
             var spec = new ProductsWithTypesAndBrandsSpecification(id);
             var productEntity = await productsRepo.GetEntityWithSpec(spec);
-            var productDto = mapper.Map<Products, ProductToReturnDto>(productEntity);
+
+            if (productEntity is null)
+            {
+                return NotFound(new ApiResponse(StatusCodes.Status404NotFound));
+            }
+
+            var productDto = mapper.Map<Products, ProductToReturnDto>(productEntity);           
 
             return Ok(productDto);
         }
@@ -71,6 +81,15 @@ namespace SkinetECommerceAPI.Controllers
             var types = await productsTypeRepo.ListAllAsync();
             return Ok(types);
         }
+
+        //[HttpGet("brands/teste")]
+        //public async Task<ActionResult<ProductBrand>> GetProductBrand(int id)
+        //{
+        //    var spec = new ProductBrandByIdSpecification(id);
+        //    var brand = await productsBrandRepo.GetEntityByIdWithSpec(spec);
+
+        //    return Ok(brand);
+        //}
 
     }
 }
