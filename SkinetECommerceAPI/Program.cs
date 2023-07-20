@@ -2,6 +2,8 @@
 using Infrastructure.Data;
 using Core.Interfaces;
 using SkinetECommerceAPI.Middleware;
+using Microsoft.AspNetCore.Mvc;
+using SkinetECommerceAPI.Errors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +26,21 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 // ---> WHEN ADDIND GENERICS TO THE CONTAINER, THE STRUCTURE MUST BE AS BELLOW
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = actionContext =>
+    {
+        var errors = actionContext.ModelState
+        .Where(e => e.Value.Errors.Count > 0)
+        .SelectMany(x => x.Value.Errors)
+        .Select(x => x.ErrorMessage).ToArray();
+
+        var errorResponse = new ApiValidationErrorResponse();
+        errorResponse.Errors = errors;
+
+        return new BadRequestObjectResult(errorResponse);
+    };
+});
 
 var app = builder.Build();
 
