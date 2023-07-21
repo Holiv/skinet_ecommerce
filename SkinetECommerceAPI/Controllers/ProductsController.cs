@@ -30,9 +30,9 @@ namespace SkinetECommerceAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<Products>>> GetProducts()
+        public async Task<ActionResult<IReadOnlyList<Products>>> GetProducts(string sort)
         {
-            var spec = new ProductsWithTypesAndBrandsSpecification();
+            var spec = new ProductsWithTypesAndBrandsSpecification(sort);
 
             IReadOnlyList<Products> productsEntity = await productsRepo.ListAsync(spec);
             var productsDto = mapper.Map<IReadOnlyList<Products>, IReadOnlyList<ProductToReturnDto>>(productsEntity);
