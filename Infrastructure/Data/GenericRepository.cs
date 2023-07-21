@@ -40,10 +40,17 @@ namespace Infrastructure.Data
             return await ApplySpecification(spec).FirstOrDefaultAsync();
         }
 
+        public async Task<int> CountAsync(ISpecification<T> spec)
+        {
+            return await ApplySpecification(spec).CountAsync();
+        }
+
         private IQueryable<T> ApplySpecification(ISpecification<T> spec)
         {
             return SpecificationEvaluator<T>.GetQuery(_storeContext.Set<T>().AsQueryable(), spec);
         }
+
+       
 
         // --- TO CREATE A GENERIC REPOSITORY WE USE
         // ----- 1. GENERIC RETURNED TYPES (Task<T>)

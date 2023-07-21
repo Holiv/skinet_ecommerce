@@ -11,6 +11,7 @@ using SkinetECommerceAPI.Errors;
 using System.Text.Json;
 using System.Net;
 using Microsoft.AspNetCore.Http.HttpResults;
+using SkinetECommerceAPI.Helpers;
 
 namespace SkinetECommerceAPI.Controllers
 {
@@ -30,14 +31,20 @@ namespace SkinetECommerceAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<Products>>> GetProducts()
+        public async Task<ActionResult<Pagination<Products>>> GetProducts([FromQuery]ProductSpecParams productParams)
         {
-            var spec = new ProductsWithTypesAndBrandsSpecification();
+            var spec = new ProductsWithTypesAndBrandsSpecification(productParams);
+            
+            var specCount = new ProductWithFiltersForCountSpecification(productParams);
+
+            var totalItems = await productsRepo.CountAsync(specCount);
 
             IReadOnlyList<Products> productsEntity = await productsRepo.ListAsync(spec);
+
             var productsDto = mapper.Map<IReadOnlyList<Products>, IReadOnlyList<ProductToReturnDto>>(productsEntity);
 
-            return Ok(productsDto);
+
+            return Ok(new Pagination<ProductToReturnDto>(productParams.PageIndex, productParams.PageSize, totalItems, productsDto));
         }
 
         [HttpGet("{id}")]
